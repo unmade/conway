@@ -1,3 +1,4 @@
+import itertools
 from typing import List, Tuple, Dict
 
 
@@ -13,18 +14,12 @@ class Grid:
     def get_neighbours(self, x: int, y: int) -> Dict[Tuple[int, int], int]:
         neighbours = {}
 
-        deltas = [-1, 0, 1]
-        for dx in deltas:
-            for dy in deltas:
-                if dx == 0 and dy == 0:
-                    continue
+        deltas = range(x - 1, x + 2), range(y - 1, y + 2)
+        for dx, dy in itertools.product(*deltas):
+            if dx == x and dy == y or (0 > dx or 0 > dy):
+                continue
 
-                nx = x + dx
-                ny = y + dy
-                if nx < 0 or ny < 0:
-                    continue
-
-                neighbours[(nx, ny)] = self.live_cells.get((nx, ny), 0)
+            neighbours[(dx, dy)] = self.live_cells.get((dx, dy), 0)
 
         return neighbours
 
@@ -34,7 +29,6 @@ class Grid:
 
     def should_live(self, x: int, y: int) -> bool:
         count = self.count_live_neighbours(x, y)
-
         return count == 3 or (count == 2 and (x, y) in self.live_cells)
 
     def tick(self) -> None:
