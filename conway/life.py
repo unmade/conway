@@ -1,14 +1,17 @@
-import copy
-from typing import List
+from typing import List, Tuple, Dict
 
 
 class Grid:
 
     def __init__(self, grid: List[List[int]]) -> None:
-        self.grid = grid
+        self.live_cells: Dict[Tuple[int, int], int] = {}
+        for x, row in enumerate(grid):
+            for y, col in enumerate(row):
+                if col:
+                    self.live_cells[(x, y)] = 1
 
-    def count_neighbours(self, x: int, y: int) -> int:
-        count = 0
+    def get_neighbours(self, x: int, y: int) -> Dict[Tuple[int, int], int]:
+        neighbours = {}
 
         deltas = [-1, 0, 1]
         for dx in deltas:
@@ -21,29 +24,26 @@ class Grid:
                 if nx < 0 or ny < 0:
                     continue
 
-                try:
-                    neighbour = self.grid[nx][ny]
-                except IndexError:
-                    continue
+                neighbours[(nx, ny)] = self.live_cells.get((nx, ny), 0)
 
-                if neighbour:
-                    count += 1
+        return neighbours
 
-        return count
+    def count_live_neighbours(self, x: int, y: int) -> int:
+        neighbours = self.get_neighbours(x, y)
+        return sum(1 for k in neighbours if neighbours[k] == 1)
 
     def should_live(self, x: int, y: int) -> bool:
-        count = self.count_neighbours(x, y)
+        count = self.count_live_neighbours(x, y)
 
-        if count == 3 or (count == 2 and self.grid[x][y]):
-            return True
-
-        return False
+        return count == 3 or (count == 2 and (x, y) in self.live_cells)
 
     def tick(self) -> None:
-        _grid = copy.deepcopy(self.grid)
+        _cells = {}
 
-        for x, row in enumerate(self.grid):
-            for y, col in enumerate(row):
-                _grid[x][y] = int(self.should_live(x, y))
+        for x, y in self.live_cells:
+            neighbours = self.get_neighbours(x, y)
+            for nx, ny in [*neighbours.keys()] + [(x, y)]:
+                if self.should_live(nx, ny):
+                    _cells[(nx, ny)] = 1
 
-        self.grid = _grid
+        self.live_cells = _cells
