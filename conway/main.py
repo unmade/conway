@@ -9,7 +9,7 @@ from conway.life import Grid
 
 
 def play():
-    grid = Grid(patterns.GOSPER)
+    grid = Grid(patterns.PATTERN_2, n=50, m=100)
 
     while True:
         grid.tick()

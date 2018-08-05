@@ -26,6 +26,11 @@ class TestGrid:
             (0, 1): 0,
             (1, 0): 1,
             (1, 1): 1,
+            (-1, -1): 0,
+            (-1, 0): 0,
+            (-1, 1): 0,
+            (0, -1): 0,
+            (1, -1): 0,
         }
 
     def test_count_live_neighbours(self, grid):
@@ -40,11 +45,19 @@ class TestGrid:
         assert grid.should_live(2, 1) is True
         assert grid.should_live(0, 0) is False
 
-    def test_tick(self, grid):
-        grid.tick()
+    def test_tick(self):
+        grid = Grid([
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 0],
+        ], n=4, m=5)
 
+        grid.tick()
         assert grid.live_cells == {
-            (0, 1): 1,
-            (1, 1): 1,
+            (0, 2): 1,
             (2, 1): 1,
+            (2, 3): 1,
+            (3, 2): 1,
+            (3, 3): 1,
         }
