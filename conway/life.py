@@ -6,12 +6,12 @@ class Grid:
 
     def __init__(self, grid: List[List[int]], n=10, m=10) -> None:
         self.n, self.m = n, m
-
+        dn, dm = (n - len(grid)) // 2, (m - len(grid[0])) // 2
         self.__live_cells: Dict[Tuple[int, int], int] = {}
         for x, row in enumerate(grid):
             for y, col in enumerate(row):
                 if col:
-                    self.__live_cells[(x, y)] = 1
+                    self.__live_cells[(x + dn + 1, y + dm + 1)] = 1
 
     @property
     def live_cells(self) -> Dict[Tuple[int, int], int]:
