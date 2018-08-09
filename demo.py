@@ -6,7 +6,7 @@ import curses
 from drawille import Canvas, animate
 
 from conway.patterns import guns, infinite, methuselah, oscillators
-from conway.life import Grid
+from conway.life import Grid, ToroidalGrid
 
 PATTERN_MAP = {
     'one': infinite.ONE,
@@ -36,20 +36,28 @@ def build_parser():
         default=0.1,
     )
 
+    _parser.add_argument(
+        '--toroidal',
+        action='store_true',
+        default=False,
+    )
+
     return _parser
 
 
-def play(scr, pattern):
+def play(scr, pattern, is_toroidal=False):
     x, y = scr.getmaxyx()
-    grid = Grid(
+    grid_cls = ToroidalGrid if is_toroidal else Grid
+    grid = grid_cls(
         pattern,
-        n=x * 4 - 10,
-        m=y * 2 - 10
+        n=x * 4 - 8,
+        m=y * 2 - 4
     )
 
     i = 0
     while True:
-        scr.addstr(x - 1, 0, f'generation: {i}')
+        scr.addstr(x - 2, 0, f'generation: {i}')
+        scr.addstr(x - 1, 0, f'population: {len(grid.live_cells)}')
         grid.tick()
         yield [(0, 0), ] + [(y, x) for x, y in grid.live_cells]
         i += 1
@@ -64,4 +72,11 @@ if __name__ == '__main__':
 
     canvas = Canvas()
 
-    animate(canvas, play, args.speed, stdscr, PATTERN_MAP[args.pattern])
+    animate(
+        canvas,
+        play,
+        args.speed,
+        stdscr,
+        PATTERN_MAP[args.pattern],
+        is_toroidal=args.toroidal,
+    )
