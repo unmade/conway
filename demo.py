@@ -5,8 +5,8 @@ import curses
 
 from drawille import Canvas, animate
 
-from conway.patterns import guns, infinite, methuselah, oscillators
 from conway.life import Grid, ToroidalGrid
+from conway.patterns import guns, infinite, methuselah, oscillators
 
 PATTERN_MAP = {
     'one': infinite.ONE,
